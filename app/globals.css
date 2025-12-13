@@ -1,0 +1,344 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+/* Reverted to light mode theme */
+:root {
+  --background: oklch(0.98 0 0);
+  --foreground: oklch(0.145 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.145 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0 0);
+  --primary: oklch(0.55 0.15 270);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.95 0 0);
+  --secondary-foreground: oklch(0.205 0 0);
+  --muted: oklch(0.96 0 0);
+  --muted-foreground: oklch(0.5 0 0);
+  --accent: oklch(0.94 0.02 270);
+  --accent-foreground: oklch(0.205 0 0);
+  --destructive: oklch(0.577 0.245 27.325);
+  --destructive-foreground: oklch(0.985 0 0);
+  --border: oklch(0.9 0 0);
+  --input: oklch(0.922 0 0);
+  --ring: oklch(0.55 0.15 270);
+  --chart-1: oklch(0.646 0.222 41.116);
+  --chart-2: oklch(0.6 0.118 184.704);
+  --chart-3: oklch(0.398 0.07 227.392);
+  --chart-4: oklch(0.828 0.189 84.429);
+  --chart-5: oklch(0.769 0.188 70.08);
+  --radius: 0.625rem;
+
+  /* Typography hierarchy */
+  --font-title-xl: 1.5rem;      /* 24px - 页面大标题 */
+  --font-title-lg: 1.25rem;     /* 20px - 卡片主标题 (Opportunities) */
+  --font-title-md: 1rem;        /* 16px - 卡片内分区标题 */
+  --font-body: 0.9375rem;       /* 15px - 列表项主文案 */
+  --font-body-sm: 0.875rem;     /* 14px - 列表项主文案(紧凑) */
+  --font-caption: 0.75rem;      /* 12px - 分区小标题/标签 */
+  --font-caption-sm: 0.6875rem; /* 11px - 辅助说明文字 */
+  --font-meta: 0.625rem;        /* 10px - badge/tag/最小文字 */
+
+  --leading-tight: 1.2;
+  --leading-base: 1.5;
+  --leading-relaxed: 1.6;
+
+  --sidebar: oklch(1 0 0);
+  --sidebar-foreground: oklch(0.3 0 0);
+  --sidebar-primary: oklch(0.55 0.15 270);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.94 0.02 270);
+  --sidebar-accent-foreground: oklch(0.145 0 0);
+  --sidebar-border: oklch(0.9 0 0);
+  --sidebar-ring: oklch(0.708 0 0);
+  
+  /* Blue color for section labels */
+  --color-blue-800: rgb(30, 58, 138);
+  --color-black: rgb(10, 10, 10);
+}
+
+.dark {
+  --background: oklch(0.145 0 0);
+  --foreground: oklch(0.985 0 0);
+  --card: oklch(0.145 0 0);
+  --card-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.145 0 0);
+  --popover-foreground: oklch(0.985 0 0);
+  --primary: oklch(0.985 0 0);
+  --primary-foreground: oklch(0.205 0 0);
+  --secondary: oklch(0.269 0 0);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.269 0 0);
+  --muted-foreground: oklch(0.708 0 0);
+  --accent: oklch(0.269 0 0);
+  --accent-foreground: oklch(0.985 0 0);
+  --destructive: oklch(0.396 0.141 25.723);
+  --destructive-foreground: oklch(0.637 0.237 25.331);
+  --border: oklch(0.269 0 0);
+  --input: oklch(0.269 0 0);
+  --ring: oklch(0.439 0 0);
+  --chart-1: oklch(0.488 0.243 264.376);
+  --chart-2: oklch(0.696 0.17 162.48);
+  --chart-3: oklch(0.769 0.188 70.08);
+  --chart-4: oklch(0.627 0.265 303.9);
+  --chart-5: oklch(0.645 0.246 16.439);
+  --sidebar: oklch(0.205 0 0);
+  --sidebar-foreground: oklch(0.985 0 0);
+  --sidebar-primary: oklch(0.488 0.243 264.376);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.269 0 0);
+  --sidebar-accent-foreground: oklch(0.985 0 0);
+  --sidebar-border: oklch(0.269 0 0);
+  --sidebar-ring: oklch(0.439 0 0);
+}
+
+@theme inline {
+  --font-sans: "Geist", "Geist Fallback";
+  --font-mono: "Geist Mono", "Geist Mono Fallback";
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  /* Typography tokens for Tailwind */
+  --text-title-xl: var(--font-title-xl);
+  --text-title-lg: var(--font-title-lg);
+  --text-title-md: var(--font-title-md);
+  --text-body: var(--font-body);
+  --text-body-sm: var(--font-body-sm);
+  --text-caption: var(--font-caption);
+  --text-caption-sm: var(--font-caption-sm);
+  --text-meta: var(--font-meta);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+@layer utilities {
+  /* ========== Page-Level Typography ========== */
+
+  /* Page title - 24px */
+  .heading-xl {
+    font-size: var(--font-title-xl); /* 24px */
+    font-weight: 700;
+    line-height: 1.75rem; /* 28px */
+    letter-spacing: -0.025em;
+    color: var(--foreground);
+  }
+
+  /* Section title - 20px */
+  .heading-lg {
+    font-size: var(--font-title-lg); /* 20px */
+    font-weight: 600;
+    line-height: 1.5rem; /* 24px */
+    color: var(--foreground);
+  }
+
+  /* ========== Card-Level Typography ========== */
+
+  /* Level 1: Card/Module Title - 16px, 24px line-height, 600 weight */
+  .card-title {
+    font-size: var(--font-title-md); /* 16px */
+    font-weight: 600;
+    line-height: 1.5rem; /* 24px */
+    color: var(--foreground);
+  }
+
+  /* Level 2: Section Label/Group Label - 11-12px, 16px line-height, 500 weight, uppercase, letter-spacing */
+  .section-label {
+    font-size: var(--font-caption-sm); /* 11px */
+    font-weight: 500;
+    line-height: 1rem; /* 16px */
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-blue-800);
+  }
+
+  /* Alternative section label at 12px */
+  .section-label-md {
+    font-size: var(--font-caption); /* 12px */
+    font-weight: 500;
+    line-height: 1rem; /* 16px */
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted-foreground);
+  }
+
+  /* ========== Content-Level Typography ========== */
+
+  /* Level 3: Primary Item Text - 14-15px, 20-22px line-height, 400 weight */
+  .body-text {
+    font-size: var(--font-body); /* 15px */
+    font-weight: 400;
+    line-height: 1.375rem; /* 22px */
+    color: var(--foreground);
+  }
+
+  /* Level 3 alternative: 14px variant */
+  .body-text-sm {
+    font-size: var(--font-body-sm); /* 14px */
+    font-weight: 400;
+    line-height: 1.25rem; /* 20px */
+  }
+
+  /* Level 4: Primary Numeric/Metric - 13-14px, 20px line-height, 500-600 weight */
+  .metric-text {
+    font-size: 0.8125rem; /* 13px */
+    font-weight: 500;
+    line-height: 1.25rem; /* 20px */
+    color: var(--foreground);
+  }
+
+  /* Level 4 alternative: 14px variant with 600 weight */
+  .metric-text-md {
+    font-size: var(--font-body-sm); /* 14px */
+    font-weight: 600;
+    line-height: 1.25rem; /* 20px */
+    color: var(--foreground);
+  }
+
+  /* Level 5: Meta/Caption - 12px, 16px line-height, 400 weight */
+  .text-caption-muted {
+    font-size: var(--font-caption); /* 12px */
+    font-weight: 400;
+    line-height: 1rem; /* 16px */
+    color: var(--muted-foreground);
+  }
+
+  /* Secondary text - 14px muted */
+  .body-muted {
+    font-size: var(--font-body-sm); /* 14px */
+    font-weight: 400;
+    line-height: 1.25rem; /* 20px */
+    color: var(--muted-foreground);
+  }
+
+  /* ========== Legacy/Compatibility Classes ========== */
+
+  /* Keep for backward compatibility */
+  .card-header {
+    font-size: var(--font-title-lg); /* 20px */
+    font-weight: 600;
+    line-height: 1.5rem;
+    color: var(--foreground);
+  }
+
+  .card-section-title {
+    font-size: var(--font-caption);
+    font-weight: 600;
+    line-height: 1rem;
+    color: var(--foreground);
+  }
+
+  .list-item-title {
+    font-size: var(--font-body-sm);
+    font-weight: 500;
+    line-height: 1.25rem;
+    color: var(--foreground);
+  }
+
+  .list-item-meta {
+    font-size: var(--font-caption);
+    font-family: var(--font-mono);
+    line-height: 1rem;
+    color: var(--muted-foreground);
+  }
+
+  .list-item-hint {
+    font-size: var(--font-caption-sm);
+    line-height: 1rem;
+    color: var(--muted-foreground);
+  }
+
+  /* ========== Special Styles ========== */
+
+  /* Link text */
+  .link-primary {
+    font-size: var(--font-caption);
+    color: var(--primary);
+  }
+  .link-primary:hover {
+    text-decoration: underline;
+  }
+
+  /* Metric with positive status color */
+  .stat-positive {
+    font-size: 0.8125rem; /* 13px */
+    font-family: var(--font-mono);
+    font-weight: 500;
+    line-height: 1.25rem;
+    color: oklch(0.6 0.15 145);
+  }
+}
+
+/* Main content area floating effect - connected with breadcrumb */
+.breadcrumb-header ~ div.flex-1.overflow-auto.p-8,
+.breadcrumb-header + div.flex-1.overflow-auto.p-8 {
+  background: transparent !important;
+  margin: 0 1rem 0 1rem !important;
+  border-width: 0px !important;
+  border-color: rgba(0, 0, 0, 0) !important;
+  border-style: none !important;
+  border-image: linear-gradient(90deg, rgba(0, 0, 0, 0) 0%, rgba(255, 255, 255, 1) 100%) 1 !important;
+  box-shadow: none !important;
+  background-clip: unset !important;
+  -webkit-background-clip: unset !important;
+  color: rgba(10, 10, 10, 1) !important;
+  box-sizing: content-box !important;
+}
+
+/* Fallback for main content area without breadcrumb */
+div.flex-1.overflow-auto.p-8:first-child {
+  background: transparent !important;
+  border-width: 0px !important;
+  border-color: rgba(0, 0, 0, 0) !important;
+  border-style: none !important;
+  border-image: linear-gradient(90deg, rgba(0, 0, 0, 0) 0%, rgba(255, 255, 255, 1) 100%) 1 !important;
+  border-radius: 0.5rem !important;
+  margin: 1rem !important;
+  box-shadow: none !important;
+  background-clip: unset !important;
+  -webkit-background-clip: unset !important;
+  color: rgba(10, 10, 10, 1) !important;
+  box-sizing: content-box !important;
+}
