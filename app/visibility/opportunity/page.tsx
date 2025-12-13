@@ -1,8 +1,8 @@
 "use client"
 
-import { useState, useMemo, useCallback, useEffect } from "react"
+import { useState, useMemo, useCallback, useEffect, Suspense } from "react"
 import { useSearchParams } from "next/navigation"
-import { Forward, X, Building2, Users, Network } from "lucide-react"
+import { Forward, X } from "lucide-react"
 import { DashboardLayout } from "@/components/dashboard-layout"
 import { BreadcrumbHeader } from "@/components/breadcrumb-header"
 import { Card } from "@/components/ui/card"
@@ -13,16 +13,13 @@ import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/h
 import { ForwardModal } from "@/components/forward-modal"
 import { SectionHeader } from "@/components/shared/section-header"
 import { OpportunityInsightCard } from "@/components/shared/opportunity-insight-card"
-import { AIAnswerSection } from "@/components/shared/ai-answer-section"
-import { CitationsSection } from "@/components/shared/citations-section"
 import { cn } from "@/lib/utils"
 import { getOpportunityInsight } from "@/lib/utils/opportunity"
-import { getStatusBadgeClassName, getStatusVariant } from "@/lib/utils/status"
 import { opportunityTableData } from "@/data/mock/opportunities"
-import { opportunityAIAnswers, opportunityCitations, opportunityAnalyses } from "@/data/mock/opportunity-details"
+import { opportunityAnalyses } from "@/data/mock/opportunity-details"
 import type { Opportunity } from "@/lib/types"
 
-export default function OpportunityPage() {
+function OpportunityPageContent() {
   const searchParams = useSearchParams()
   const [selectedCategory, setSelectedCategory] = useState<string>("All opportunities")
   const [competitorView, setCompetitorView] = useState<"all" | "competitor">("all")
@@ -698,5 +695,13 @@ export default function OpportunityPage() {
         })() : undefined}
       />
     </DashboardLayout>
+  )
+}
+
+export default function OpportunityPage() {
+  return (
+    <Suspense fallback={<div className="flex items-center justify-center h-screen">Loading...</div>}>
+      <OpportunityPageContent />
+    </Suspense>
   )
 }
