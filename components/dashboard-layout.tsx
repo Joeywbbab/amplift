@@ -1,6 +1,7 @@
 "use client"
 
 import type { ReactNode } from "react"
+import { useState } from "react"
 import Link from "next/link"
 import { cn } from "@/lib/utils"
 import {
@@ -16,9 +17,17 @@ import {
   Search,
   Bell,
   Globe,
+  PenTool,
+  CheckCircle2,
+  X,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
 
 interface DashboardLayoutProps {
   children: ReactNode
@@ -40,6 +49,37 @@ const visibilitySubNav = [
   { id: "opportunity", label: "Opportunity", icon: Target, href: "/visibility/opportunity" },
   { id: "ai-performance", label: "AI performance", icon: Sparkles, href: "/visibility/ai-performance" },
   { id: "social-tracker", label: "Social tracker", icon: Share2, href: "/visibility/social-tracker" },
+]
+
+// Mock notifications data
+const notifications = [
+  {
+    id: 1,
+    type: "writing",
+    title: "AI Writing completed",
+    description: "Content for \"Best marketing automation tools\" is ready",
+    time: "2 min ago",
+    read: false,
+    href: "/content",
+  },
+  {
+    id: 2,
+    type: "writing",
+    title: "AI Writing completed",
+    description: "Content for \"Email marketing best practices\" is ready",
+    time: "15 min ago",
+    read: false,
+    href: "/content",
+  },
+  {
+    id: 3,
+    type: "alert",
+    title: "New opportunity detected",
+    description: "High-volume prompt opportunity found in your industry",
+    time: "1 hour ago",
+    read: false,
+    href: "/visibility/opportunity",
+  },
 ]
 
 export function DashboardLayout({
@@ -66,12 +106,65 @@ export function DashboardLayout({
           <Button variant="ghost" size="icon" className="h-8 w-8" title="Search ⌘K" aria-label="Search (Command+K)">
             <Search className="h-4 w-4" />
           </Button>
-          <Button variant="ghost" size="icon" className="h-8 w-8 relative" aria-label="Notifications (3 unread)">
-            <Bell className="h-4 w-4" />
-            <Badge className="absolute -top-1 -right-1 h-5 w-5 p-0 flex items-center justify-center bg-red-500 text-white text-[10px]">
-              3
-            </Badge>
-          </Button>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="ghost" size="icon" className="h-8 w-8 relative" aria-label="Notifications (3 unread)">
+                <Bell className="h-4 w-4" />
+                <Badge className="absolute -top-1 -right-1 h-5 w-5 p-0 flex items-center justify-center bg-red-500 text-white text-[10px]">
+                  {notifications.filter(n => !n.read).length}
+                </Badge>
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-80 p-0" align="end">
+              <div className="flex items-center justify-between p-3 border-b">
+                <h3 className="font-semibold text-sm">Notifications</h3>
+                <button className="text-xs text-muted-foreground hover:text-foreground">
+                  Mark all as read
+                </button>
+              </div>
+              <div className="max-h-[300px] overflow-y-auto">
+                {notifications.map((notification) => (
+                  <Link
+                    key={notification.id}
+                    href={notification.href}
+                    className={cn(
+                      "flex items-start gap-3 p-3 hover:bg-muted/50 transition-colors border-b last:border-0",
+                      !notification.read && "bg-primary/5"
+                    )}
+                  >
+                    <div className={cn(
+                      "w-8 h-8 rounded-full flex items-center justify-center shrink-0",
+                      notification.type === "writing" 
+                        ? "bg-green-100 dark:bg-green-900/30" 
+                        : "bg-blue-100 dark:bg-blue-900/30"
+                    )}>
+                      {notification.type === "writing" ? (
+                        <CheckCircle2 className="w-4 h-4 text-green-600 dark:text-green-400" />
+                      ) : (
+                        <Target className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium">{notification.title}</p>
+                      <p className="text-xs text-muted-foreground line-clamp-2">{notification.description}</p>
+                      <p className="text-xs text-muted-foreground mt-1">{notification.time}</p>
+                    </div>
+                    {!notification.read && (
+                      <div className="w-2 h-2 rounded-full bg-primary shrink-0 mt-1.5" />
+                    )}
+                  </Link>
+                ))}
+              </div>
+              <div className="p-2 border-t">
+                <Link 
+                  href="/notifications" 
+                  className="block text-center text-xs text-muted-foreground hover:text-foreground py-1"
+                >
+                  View all notifications
+                </Link>
+              </div>
+            </PopoverContent>
+          </Popover>
           <div className="flex items-center gap-2 ml-2">
             <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-xs font-semibold">
               AS

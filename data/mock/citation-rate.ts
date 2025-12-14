@@ -32,3 +32,4 @@ export const citationRateAnalysis: CitationRateAnalysis = {
     description: "Negative mentions primarily appear in community forums (Reddit, Tesla Motors Club) and social media (Twitter), focusing on pricing concerns and service quality issues.",
   },
 }
+

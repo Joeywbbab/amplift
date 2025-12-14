@@ -793,17 +793,6 @@ export default function OverviewPage() {
                     <Link2 className="w-4 h-4" />
                     Search Console
                   </button>
-                  <button
-                    onClick={() => setBrandModalTab("saved")}
-                    className={`w-full flex items-center gap-2 px-3 py-2 rounded-md body-text-sm transition-colors ${
-                      brandModalTab === "saved"
-                        ? "bg-card text-foreground font-medium shadow-sm"
-                        : "text-muted-foreground hover:text-foreground hover:bg-card/50"
-                    }`}
-                  >
-                    <Bookmark className="w-4 h-4" />
-                    Saved
-                  </button>
                 </nav>
               </div>
 
@@ -815,7 +804,6 @@ export default function OverviewPage() {
                     {brandModalTab === "competitors" && "Direct Competitors"}
                     {brandModalTab === "geo-history" && "GEO Checker History"}
                     {brandModalTab === "gsc" && "Google Search Console"}
-                    {brandModalTab === "saved" && "Saved"}
                   </h2>
                   <button
                     onClick={() => setShowBrandModal(false)}
@@ -901,30 +889,6 @@ export default function OverviewPage() {
                     </div>
                   )}
 
-                  {/* Saved Tab */}
-                  {brandModalTab === "saved" && (
-                    <div className="space-y-3">
-                      <p className="body-muted mb-4">
-                        Your saved posts from Social Tracker.
-                      </p>
-                      {savedPosts.map((post) => (
-                        <Link
-                          key={post.id}
-                          href={`/visibility/social-tracker/${post.id}`}
-                          className="block p-4 bg-muted/50 rounded-lg hover:bg-muted transition-colors cursor-pointer"
-                        >
-                          <h3 className="body-text-sm font-medium mb-2 line-clamp-2">{post.title}</h3>
-                          <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                            <span>{post.source}</span>
-                            <span>·</span>
-                            <span>{post.time}</span>
-                            <span>·</span>
-                            <span>{post.sources} sources</span>
-                          </div>
-                        </Link>
-                      ))}
-                    </div>
-                  )}
 
                   {/* GEO Checker History Tab */}
                   {brandModalTab === "geo-history" && (
