@@ -233,44 +233,24 @@ export default function SocialTrackerPage() {
                 >
                   Trends
                 </button>
-                <DropdownMenu>
-                  <DropdownMenuTrigger
-                    className={cn(
-                      "px-4 py-1.5 rounded-full text-sm font-medium transition-colors flex items-center gap-1 text-muted-foreground hover:text-foreground outline-none"
-                    )}
-                    style={{
-                      borderWidth: "0px",
-                      borderColor: "rgba(0, 0, 0, 0)",
-                      borderStyle: "none",
-                      borderImage: "linear-gradient(90deg, rgba(0, 0, 0, 0) 0%, rgba(255, 255, 255, 1) 100%) 1",
-                      backgroundClip: "unset",
-                      WebkitBackgroundClip: "unset",
-                      color: "var(--color-black)",
-                      boxSizing: "content-box",
-                      boxShadow: "none",
-                    }}
-                  >
-                    Topics
-                    <ChevronDown className="h-3 w-3" />
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="start" className="min-w-[200px]">
-                    {topicClusters.map((cluster, idx) => (
-                      <DropdownMenuItem
-                        key={idx}
-                        onClick={() => router.push(`/visibility/ai-performance/${idx + 1}`)}
-                        className="cursor-pointer"
-                      >
-                        <div className="flex items-center justify-between w-full">
-                          <div>
-                            <div className="text-sm font-medium">{cluster.name}</div>
-                            <div className="text-xs text-muted-foreground">{cluster.prompts} prompts</div>
-                          </div>
-                          <div className="text-sm font-mono font-semibold ml-4">{cluster.visibility}</div>
-                        </div>
-                      </DropdownMenuItem>
-                    ))}
-                  </DropdownMenuContent>
-                </DropdownMenu>
+                 <button
+                   className={cn(
+                     "px-4 py-1.5 rounded-full text-sm font-medium transition-colors text-muted-foreground hover:text-foreground outline-none"
+                   )}
+                   style={{
+                     borderWidth: "0px",
+                     borderColor: "rgba(0, 0, 0, 0)",
+                     borderStyle: "none",
+                     borderImage: "linear-gradient(90deg, rgba(0, 0, 0, 0) 0%, rgba(255, 255, 255, 1) 100%) 1",
+                     backgroundClip: "unset",
+                     WebkitBackgroundClip: "unset",
+                     color: "var(--color-black)",
+                     boxSizing: "content-box",
+                     boxShadow: "none",
+                   }}
+                 >
+                   Discussions
+                 </button>
               </div>
             </div>
           </div>

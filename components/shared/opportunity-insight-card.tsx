@@ -47,3 +47,4 @@ export function OpportunityInsightCard({ insight, className }: OpportunityInsigh
 
 
 
+
