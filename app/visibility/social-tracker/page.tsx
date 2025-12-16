@@ -633,9 +633,9 @@ export default function SocialTrackerPage() {
               <Card className="p-5 border-0 shadow-sm">
                 <h3 className="font-semibold mb-4">Expand Your Topics</h3>
                 
-                {/* Website Topics (Selected) */}
+                {/* Current Topics (Selected) */}
                 <div className="mb-4">
-                  <p className="text-xs text-muted-foreground mb-2 font-medium">Website</p>
+                  <p className="text-xs text-muted-foreground mb-2 font-medium">Current</p>
                   <div className="flex flex-wrap gap-2">
                     {websiteTopics.map((topic) => (
                       <button
@@ -648,9 +648,9 @@ export default function SocialTrackerPage() {
                   </div>
                 </div>
 
-                {/* Industry Recommended Topics */}
+                {/* Expand Recommended Topics */}
                 <div>
-                  <p className="text-xs text-muted-foreground mb-2 font-medium">Industry</p>
+                  <p className="text-xs text-muted-foreground mb-2 font-medium">Expand</p>
                   <div className="flex flex-wrap gap-2">
                     {industryTopics.map((topic) => (
                       <button
