@@ -47,7 +47,7 @@ const metrics = [
   {
     id: "usage",
     label: "Citation Rate",
-    value: "1.2K",
+    value: "12%",
     trend: "+8%",
     up: true,
     content: {
@@ -94,8 +94,8 @@ const metrics = [
     id: "geo-score",
     label: "GEO score",
     value: "78",
-    trend: null,
-    up: null,
+    trend: "+5",
+    up: true,
     content: {
       title: "Generative Engine Optimization Score",
       description:
@@ -412,20 +412,22 @@ export default function AIPerformancePage() {
                 >
                   <div className="flex items-center justify-between gap-4 w-full">
                     <div className="text-sm text-muted-foreground min-w-[100px]">{metric.label}</div>
-                    <div className="text-2xl font-bold">
-                      {metric.value || <span className="text-base text-muted-foreground">To be tested</span>}
-                    </div>
-                    {metric.trend && (
-                      <div
-                        className={cn(
-                          "flex items-center gap-1 text-xs font-medium min-w-[50px]",
-                          metric.up ? "text-green-600" : "text-red-600",
-                        )}
-                      >
-                        {metric.up ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
-                        {metric.trend}
+                    <div className="flex items-center gap-2">
+                      {metric.trend && (
+                        <div
+                          className={cn(
+                            "flex items-center gap-0.5 text-xs font-medium",
+                            metric.up ? "text-green-600" : "text-red-600",
+                          )}
+                        >
+                          {metric.up ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
+                          {metric.trend}
+                        </div>
+                      )}
+                      <div className="text-2xl font-bold">
+                        {metric.value || <span className="text-base text-muted-foreground">To be tested</span>}
                       </div>
-                    )}
+                    </div>
                   </div>
                 </Card>
               ))}
