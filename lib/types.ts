@@ -119,10 +119,16 @@ export interface VisibilityPerformanceAnalysis {
 }
 
 // Citation Rate types
+export interface TopDomain {
+  domain: string
+  pageUrl?: string // Only for Own type
+}
+
 export interface CitationDomain {
   domainType: string // 域名类型，如 "第三方社区", "能源信息平台", "竞品网站", "官方网站"
   domain: string // 域名
-  citationCount: number // 引用次数
+  citationCount: string | number // 引用次数（可以是数字或百分比字符串）
+  top3Domains?: TopDomain[] // Top 3 domains, if Own type then pageUrl, otherwise domain
 }
 
 export interface CitationRateAnalysis {
@@ -316,6 +322,7 @@ export interface TableSort {
   field: string | null
   direction: "asc" | "desc"
 }
+
 
 
 

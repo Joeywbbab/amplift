@@ -17,7 +17,7 @@ import {
   Plus,
   Send,
   ChevronRight,
-  Clock,
+  Calendar,
   ChevronDown,
   ChevronUp,
 } from "lucide-react"
@@ -59,7 +59,7 @@ const allPrompts = [
     visibility: "78%",
     volume: "22.3K",
     mentions: ["HubSpot", "Marketo"],
-    intent: "Commercial",
+    intent: "Transactional",
     similarity: 8.6,
     status: "active",
     isTest: false,
@@ -85,7 +85,7 @@ const allPrompts = [
     visibility: "71%",
     volume: "7.8K",
     mentions: ["Marketo", "Pardot"],
-    intent: "Commercial",
+    intent: "Transactional",
     similarity: 8.4,
     status: "active",
     isTest: false,
@@ -98,7 +98,7 @@ const allPrompts = [
     visibility: "70%",
     volume: "18.2K",
     mentions: ["OpenAI", "Jasper"],
-    intent: "Commercial",
+    intent: "Transactional",
     similarity: 7.8,
     status: "active",
     isTest: false,
@@ -124,7 +124,7 @@ const allPrompts = [
     visibility: "63%",
     volume: "14.2K",
     mentions: ["Mixpanel", "Heap"],
-    intent: "Commercial",
+    intent: "Transactional",
     similarity: 7.4,
     status: "inactive",
     isTest: false,
@@ -150,7 +150,7 @@ const allPrompts = [
     visibility: "74%",
     volume: "28.5K",
     mentions: ["Mailchimp", "SendGrid"],
-    intent: "Commercial",
+    intent: "Transactional",
     similarity: 8.1,
     status: "active",
     isTest: false,
@@ -176,7 +176,7 @@ const allPrompts = [
     visibility: "62%",
     volume: "16.7K",
     mentions: ["LinkedIn", "ZoomInfo"],
-    intent: "Commercial",
+    intent: "Transactional",
     similarity: 7.2,
     status: "active",
     isTest: false,
@@ -824,12 +824,12 @@ export default function DataPage() {
                             <span className="body-text-sm text-muted-foreground">{prompt.topic}</span>
                           </td>
                           <td className="px-4 py-2.5">
-                            <span className="body-text-sm font-mono font-semibold text-green-600 text-right">
+                            <span className="text-xs font-mono font-semibold text-green-600 text-right">
                               {prompt.visibility}
                             </span>
                           </td>
                           <td className="px-4 py-2.5">
-                            <span className="body-text-sm font-mono text-muted-foreground text-right">
+                            <span className="text-xs font-mono text-muted-foreground text-right">
                               {prompt.volume}
                             </span>
                           </td>
@@ -851,13 +851,13 @@ export default function DataPage() {
                             </div>
                           </td>
                           <td className="px-4 py-2.5">
-                            <Badge variant="outline" className="font-mono text-caption-muted">
+                            <Badge variant="outline" className="font-mono text-xs">
                               {prompt.similarity}%
                             </Badge>
                           </td>
                           <td className="px-4 py-2.5">
                             <div className="flex items-center justify-between gap-2">
-                              <span className="body-text-sm font-mono text-muted-foreground">
+                              <span className="text-xs font-mono text-muted-foreground">
                                 {prompt.aiAnswersCount || 0}
                               </span>
                               <button
@@ -1019,7 +1019,7 @@ export default function DataPage() {
                             </span>
                           </td>
                           <td className="px-4 py-2.5">
-                            <span className="body-text-sm font-mono font-semibold text-green-600 text-right">
+                            <span className="text-xs font-mono font-semibold text-green-600 text-right">
                               {citation.citationRate}
                             </span>
                           </td>
@@ -1036,7 +1036,7 @@ export default function DataPage() {
                             </div>
                           </td>
                           <td className="px-4 py-2.5">
-                            <span className="text-caption-muted font-mono">
+                            <span className="text-xs font-mono text-muted-foreground">
                               {citation.lastCited}
                             </span>
                           </td>
@@ -1196,12 +1196,12 @@ export default function DataPage() {
         </div>
       )}
 
-      {/* Answer History Sheet */}
+      {/* Answers Sheet */}
       <Sheet open={showAnswerHistory} onOpenChange={setShowAnswerHistory}>
         <SheetContent side="right" className="w-full sm:max-w-2xl">
           <SheetHeader>
             <SheetTitle>
-              {selectedPromptForHistory && allPrompts.find((p) => p.id === selectedPromptForHistory)?.prompt}
+              {selectedPromptForHistory ? allPrompts.find((p) => p.id === selectedPromptForHistory)?.prompt : "Answers"}
             </SheetTitle>
           </SheetHeader>
           
@@ -1242,7 +1242,7 @@ export default function DataPage() {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" size="sm" className="text-xs">
-                  <Clock className="w-3 h-3 mr-1.5" />
+                  <Calendar className="w-3 h-3 mr-1.5" />
                   {answerHistoryTimeFilter === "all" ? "All Time" : answerHistoryTimeFilter === "today" ? "Today" : answerHistoryTimeFilter === "week" ? "This Week" : "This Month"}
                 </Button>
               </DropdownMenuTrigger>
@@ -1320,7 +1320,7 @@ export default function DataPage() {
                             {item.engine}
                           </Badge>
                           <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                            <Clock className="w-3 h-3" />
+                            <Calendar className="w-3 h-3" />
                             <span>{item.timestamp}</span>
                           </div>
                         </div>

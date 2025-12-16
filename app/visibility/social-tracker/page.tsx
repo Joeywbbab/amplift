@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useMemo } from "react"
+import { useState, useMemo, Fragment } from "react"
 import { useRouter } from "next/navigation"
 import { DashboardLayout } from "@/components/dashboard-layout"
 import { Card } from "@/components/ui/card"
@@ -21,6 +21,8 @@ import {
   ChevronDown,
   ListFilter,
   CheckCircle2,
+  Forward,
+  Bookmark,
 } from "lucide-react"
 import {
   DropdownMenu,
@@ -177,9 +179,41 @@ const topicClusters = [
   { name: "Customer Engagement", prompts: 4, visibility: "52%" },
 ]
 
+// Discussions data
+const discussionsData = [
+  {
+    id: 1,
+    title: "What are the best marketing automation tools for small businesses?",
+    topic: "Marketing Automation",
+    description: "Small business owners are discussing affordable marketing automation solutions that integrate with their existing workflows.",
+    subreddits: ["r/marketing", "r/smallbusiness", "r/entrepreneur"],
+  },
+  {
+    id: 2,
+    title: "How to choose between HubSpot and Salesforce for marketing?",
+    topic: "CRM Comparison",
+    description: "Community members are comparing HubSpot and Salesforce features, pricing, and implementation complexity.",
+    subreddits: ["r/salesforce", "r/hubspot", "r/marketing"],
+  },
+  {
+    id: 3,
+    title: "Email marketing automation best practices in 2024",
+    topic: "Email Marketing",
+    description: "Discussion about modern email automation strategies, segmentation techniques, and deliverability improvements.",
+    subreddits: ["r/emailmarketing", "r/digital_marketing", "r/marketing"],
+  },
+  {
+    id: 4,
+    title: "AI tools for content creation - recommendations needed",
+    topic: "AI Content Tools",
+    description: "Users sharing experiences with AI-powered content creation tools and their impact on marketing workflows.",
+    subreddits: ["r/marketing", "r/artificial", "r/content_marketing"],
+  },
+]
+
 export default function SocialTrackerPage() {
   const router = useRouter()
-  const [activeTab, setActiveTab] = useState<"trends">("trends")
+  const [activeTab, setActiveTab] = useState<"trends" | "discussions">("discussions")
   const [forwardingPost, setForwardingPost] = useState<{ id: number; title: string } | null>(null)
 
   const closeForwardModal = () => {
@@ -234,8 +268,12 @@ export default function SocialTrackerPage() {
                   Trends
                 </button>
                  <button
+                   onClick={() => setActiveTab("discussions")}
                    className={cn(
-                     "px-4 py-1.5 rounded-full text-sm font-medium transition-colors text-muted-foreground hover:text-foreground outline-none"
+                     "px-4 py-1.5 rounded-full text-sm font-medium transition-colors",
+                     activeTab === "discussions"
+                       ? "bg-muted text-foreground"
+                       : "text-muted-foreground hover:text-foreground"
                    )}
                    style={{
                      borderWidth: "0px",
@@ -256,8 +294,44 @@ export default function SocialTrackerPage() {
           </div>
 
           <div className="flex gap-8">
-              {/* Main Content Area */}
-              <div className="flex-1 min-w-0">
+            {/* Main Content Area */}
+            <div className="flex-1 min-w-0">
+              {activeTab === "discussions" ? (
+                /* Discussions Content */
+                <div className="space-y-4">
+                  {discussionsData.map((discussion) => (
+                    <Card
+                      key={discussion.id}
+                      className="p-6 cursor-pointer hover:shadow-md transition-all border-0 shadow-sm"
+                      onClick={() => router.push(`/visibility/social-tracker/discussions/${discussion.id}`)}
+                    >
+                      <h3 className="heading-lg mb-3 text-foreground">{discussion.title}</h3>
+                      
+                      <div className="flex items-center gap-2 mb-3">
+                        <Badge variant="secondary" className="text-xs">
+                          {discussion.topic}
+                        </Badge>
+                      </div>
+
+                      <p className="body-text-sm text-muted-foreground mb-4 leading-relaxed">
+                        {discussion.description}
+                      </p>
+
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs text-muted-foreground font-medium">Subreddits:</span>
+                        <div className="flex flex-wrap gap-2">
+                          {discussion.subreddits.map((subreddit, idx) => (
+                            <Badge key={idx} variant="outline" className="text-xs">
+                              {subreddit}
+                            </Badge>
+                          ))}
+                        </div>
+                      </div>
+                    </Card>
+                  ))}
+                </div>
+              ) : (
+                <Fragment>
               {/* Featured Article Card */}
               <Card className="mb-8 overflow-hidden border-0 shadow-sm">
                 <div className="flex">
@@ -376,15 +450,38 @@ export default function SocialTrackerPage() {
                           >
                             <Heart className="h-4 w-4" />
                           </button>
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation()
-                              setForwardingPost({ id: article.id, title: article.title })
-                            }}
-                            className="p-1.5 text-muted-foreground hover:text-foreground rounded-md hover:bg-muted transition-colors"
-                          >
-                            <MoreHorizontal className="h-4 w-4" />
-                          </button>
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation()
+                                }}
+                                className="p-1.5 text-muted-foreground hover:text-foreground rounded-md hover:bg-muted transition-colors"
+                              >
+                                <MoreHorizontal className="h-4 w-4" />
+                              </button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()}>
+                              <DropdownMenuItem
+                                onClick={(e) => {
+                                  e.stopPropagation()
+                                  console.log("Save article", article.id)
+                                }}
+                              >
+                                <Bookmark className="h-4 w-4 mr-2" />
+                                Save
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                onClick={(e) => {
+                                  e.stopPropagation()
+                                  setForwardingPost({ id: article.id, title: article.title })
+                                }}
+                              >
+                                <Forward className="h-4 w-4 mr-2" />
+                                Send
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
                         </div>
                       </div>
                     </div>
@@ -524,8 +621,10 @@ export default function SocialTrackerPage() {
                       </div>
                     </Card>
                   )
-                })}
+                  })}
               </div>
+              </Fragment>
+              )}
             </div>
 
             {/* Right Sidebar */}

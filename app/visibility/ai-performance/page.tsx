@@ -6,7 +6,13 @@ import { BreadcrumbHeader } from "@/components/breadcrumb-header"
 import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { TrendingUp, TrendingDown, ChevronDown, ChevronRight, LayoutGrid } from "lucide-react"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { TrendingUp, TrendingDown, ChevronDown, ChevronRight, LayoutGrid, Calendar, Check } from "lucide-react"
 import Link from "next/link"
 import { cn } from "@/lib/utils"
 import { useRouter } from "next/navigation"
@@ -87,13 +93,13 @@ const metrics = [
   {
     id: "geo-score",
     label: "GEO score",
-    value: null,
+    value: "78",
     trend: null,
     up: null,
     content: {
       title: "Generative Engine Optimization Score",
       description:
-        "GEO (Generative Engine Optimization) is a comprehensive metric that measures how well your content is optimized for AI platforms. It evaluates content quality, citation authority, freshness, and relevance to determine your overall performance in AI-driven search results.",
+        "GEO measures how well your content is optimized for AI platforms.",
       intro: true,
     },
   },
@@ -114,7 +120,7 @@ const topics = [
         visibility: "78%",
         volume: "22.3K",
         mentions: ["HubSpot", "Marketo"],
-        intent: "Commercial",
+        intent: "Transactional",
         similarity: 8.6,
       },
       {
@@ -130,7 +136,7 @@ const topics = [
         visibility: "71%",
         volume: "7.8K",
         mentions: ["Marketo", "Pardot"],
-        intent: "Commercial",
+        intent: "Transactional",
         similarity: 8.4,
       },
     ],
@@ -149,7 +155,7 @@ const topics = [
         visibility: "70%",
         volume: "18.2K",
         mentions: ["OpenAI", "Jasper"],
-        intent: "Commercial",
+        intent: "Transactional",
         similarity: 7.8,
       },
       {
@@ -168,7 +174,7 @@ const topics = [
     visibility: "81%",
     searchVolume: "52.8K",
     mentions: ["Mailchimp", "SendGrid", "ActiveCampaign"],
-    intent: "Commercial",
+    intent: "Transactional",
     similarity: 9.1,
     prompts: [
       {
@@ -176,7 +182,7 @@ const topics = [
         visibility: "84%",
         volume: "28.1K",
         mentions: ["Mailchimp", "Klaviyo"],
-        intent: "Commercial",
+        intent: "Transactional",
         similarity: 9.2,
       },
       {
@@ -203,7 +209,7 @@ const topics = [
         visibility: "68%",
         volume: "14.2K",
         mentions: ["Mixpanel", "Heap"],
-        intent: "Commercial",
+        intent: "Transactional",
         similarity: 7.4,
       },
       {
@@ -293,6 +299,7 @@ export default function AIPerformancePage() {
   const [selectedMetric, setSelectedMetric] = useState(metrics[0])
   const [expandedTopics, setExpandedTopics] = useState<number[]>([])
   const [expandedDomains, setExpandedDomains] = useState<string[]>([])
+  const [timeFilter, setTimeFilter] = useState<string>("week")
   const router = useRouter()
 
   const toggleTopicExpand = (topicId: number) => {
@@ -303,14 +310,93 @@ export default function AIPerformancePage() {
     setExpandedDomains((prev) => (prev.includes(domain) ? prev.filter((d) => d !== domain) : [...prev, domain]))
   }
 
+  // Export AI Performance Report as CSV
+  const handleExport = () => {
+    const csvRows = []
+    
+    // Header
+    csvRows.push("AI Performance Report - Export")
+    csvRows.push(`Generated: ${new Date().toLocaleDateString()}`)
+    csvRows.push(`Time Filter: ${timeFilter === "all" ? "All Time" : timeFilter === "today" ? "Today" : timeFilter === "week" ? "1 Week" : "1 Month"}`)
+    csvRows.push("")
+    
+    // Metrics Summary
+    csvRows.push("METRICS SUMMARY")
+    metrics.forEach(metric => {
+      csvRows.push(`${metric.label},${metric.value},${metric.trend || "N/A"}`)
+    })
+    csvRows.push("")
+    
+    // Topics/Prompts
+    csvRows.push("TOPICS/PROMPTS")
+    csvRows.push("Topic/Prompt,Visibility,AI Volume,Mentions,Intent,Similarity")
+    topics.forEach(topic => {
+      csvRows.push(`"${topic.name}","${topic.visibility}","${topic.searchVolume}","${topic.mentions.join("; ")}","${topic.intent}","${topic.similarity}%"`)
+      topic.prompts.forEach(prompt => {
+        csvRows.push(`"  - ${prompt.prompt}","${prompt.visibility}","${prompt.volume}","${prompt.mentions.join("; ")}","${prompt.intent}","${prompt.similarity}%"`)
+      })
+    })
+    csvRows.push("")
+    
+    // Citations
+    csvRows.push("CITATIONS")
+    csvRows.push("Domain,Type,Category,Citation Rate,Mentioned By")
+    citations.forEach(citation => {
+      csvRows.push(`"${citation.domain}","${citation.type}","${citation.category}","${citation.citationRate}","${citation.mentionedBy}"`)
+      citation.pages.forEach(page => {
+        csvRows.push(`"  - ${page.url}","","","${page.citationRate}",""`)
+      })
+    })
+    
+    // Create and download file
+    const csvContent = csvRows.join("\n")
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" })
+    const link = document.createElement("a")
+    const url = URL.createObjectURL(blob)
+    link.setAttribute("href", url)
+    link.setAttribute("download", `ai-performance-report-${new Date().toISOString().split("T")[0]}.csv`)
+    link.style.visibility = "hidden"
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+  }
+
   return (
     <DashboardLayout currentSection="visibility" currentSubSection="ai-performance">
-      <BreadcrumbHeader items={["Home", "Visibility", "AI performance", "Amplift"]} action={{ label: "Export" }} />
+      <BreadcrumbHeader items={["Home", "Visibility", "AI performance", "Amplift"]} action={{ label: "Export", onClick: handleExport }} />
 
       <div className="flex-1 overflow-auto p-8">
         {/* AI Performance */}
         <div className="mb-8">
-          <h2 className="text-xl font-semibold mb-4">AI performance</h2>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-semibold">AI performance</h2>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="sm" className="text-xs">
+                  <Calendar className="w-3 h-3 mr-1.5" />
+                  {timeFilter === "all" ? "All Time" : timeFilter === "today" ? "Today" : timeFilter === "week" ? "1 Week" : "1 Month"}
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={() => setTimeFilter("all")}>
+                  All Time
+                  {timeFilter === "all" && <Check className="ml-auto w-4 h-4" />}
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setTimeFilter("today")}>
+                  Today
+                  {timeFilter === "today" && <Check className="ml-auto w-4 h-4" />}
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setTimeFilter("week")}>
+                  1 Week
+                  {timeFilter === "week" && <Check className="ml-auto w-4 h-4" />}
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setTimeFilter("month")}>
+                  1 Month
+                  {timeFilter === "month" && <Check className="ml-auto w-4 h-4" />}
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
 
           <div className="grid grid-cols-[256px_1fr] gap-6">
             {/* Left: Vertical Metric Cards */}
@@ -428,7 +514,8 @@ export default function AIPerformancePage() {
                           <thead className="bg-muted/40 border-b">
                             <tr>
                               <th className="text-left px-2 py-1.5 text-xs font-medium text-muted-foreground uppercase">Type</th>
-                              <th className="text-center px-2 py-1.5 text-xs font-medium text-muted-foreground uppercase">Citations</th>
+                              <th className="text-center px-2 py-1.5 text-xs font-medium text-muted-foreground uppercase">Citation Rate</th>
+                              <th className="text-left px-2 py-1.5 text-xs font-medium text-muted-foreground uppercase">Top 3 Domain</th>
                             </tr>
                           </thead>
                           <tbody>
@@ -447,7 +534,22 @@ export default function AIPerformancePage() {
                                     {row.domainType}
                                   </Badge>
                                 </td>
-                                <td className="px-2 py-1.5 text-center text-xs font-mono">{row.citationCount}</td>
+                                <td className="px-2 py-1.5 text-center text-xs">{row.citationCount}</td>
+                                <td className="px-2 py-1.5">
+                                  {row.top3Domains && row.top3Domains.length > 0 ? (
+                                    <div className="flex flex-wrap gap-2">
+                                      {row.top3Domains.map((domainItem, domainIdx) => (
+                                        <span key={domainIdx} className="text-xs text-muted-foreground">
+                                          {row.domainType.toLowerCase() === "own" && domainItem.pageUrl
+                                            ? domainItem.pageUrl
+                                            : domainItem.domain}
+                                        </span>
+                                      ))}
+                                    </div>
+                                  ) : (
+                                    <span className="text-xs text-muted-foreground">-</span>
+                                  )}
+                                </td>
                               </tr>
                             ))}
                           </tbody>
@@ -569,10 +671,100 @@ export default function AIPerformancePage() {
                 )
               ) : (
                 <>
-                  <div className="flex-1" />
-                  <Button onClick={() => router.push("/visibility/geo-performance")} className="w-full" size="lg">
-                    Check your geo performance
-                  </Button>
+                  {/* GEO Scores Display - Three Scores */}
+                  <div className="grid grid-cols-3 gap-4 mb-6">
+                    {/* Overall GEO Score */}
+                    <div>
+                      <div className="flex items-center justify-between mb-2">
+                        <h4 className="text-xs font-semibold text-primary uppercase">GEO SCORE</h4>
+                        <span className="text-xs text-muted-foreground">Overall</span>
+                      </div>
+                      <div className="flex items-baseline gap-1 mb-2">
+                        <span className="text-3xl font-bold">78</span>
+                        <span className="text-xs text-muted-foreground">/100</span>
+                      </div>
+                      <div className="w-full h-1.5 bg-muted rounded-full overflow-hidden">
+                        <div 
+                          className="h-full bg-primary rounded-full transition-all"
+                          style={{ width: "78%" }}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Technical Readiness */}
+                    <div>
+                      <div className="mb-2">
+                        <h4 className="text-xs font-semibold text-primary uppercase">TECHNICAL READINESS</h4>
+                      </div>
+                      <div className="flex items-baseline gap-1 mb-2">
+                        <span className="text-3xl font-bold">85</span>
+                        <span className="text-xs text-muted-foreground">/100</span>
+                      </div>
+                      <div className="w-full h-1.5 bg-muted rounded-full overflow-hidden">
+                        <div 
+                          className="h-full bg-primary rounded-full transition-all"
+                          style={{ width: "85%" }}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Content Quality */}
+                    <div>
+                      <div className="mb-2">
+                        <h4 className="text-xs font-semibold text-primary uppercase">CONTENT QUALITY</h4>
+                      </div>
+                      <div className="flex items-baseline gap-1 mb-2">
+                        <span className="text-3xl font-bold">72</span>
+                        <span className="text-xs text-muted-foreground">/100</span>
+                      </div>
+                      <div className="w-full h-1.5 bg-muted rounded-full overflow-hidden">
+                        <div 
+                          className="h-full bg-primary rounded-full transition-all"
+                          style={{ width: "72%" }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Critical Issues */}
+                  <div className="mt-auto">
+                    <div 
+                      className="flex items-center justify-between mb-3 cursor-pointer group"
+                      onClick={() => router.push("/visibility/geo-report")}
+                    >
+                      <h4 className="text-sm font-semibold text-muted-foreground">Critical Issues</h4>
+                      <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:text-foreground transition-colors" />
+                    </div>
+                    <div className="space-y-2">
+                      {[
+                        { id: 1, title: "Missing structured data markup", type: "technical" },
+                        { id: 2, title: "Low content freshness score", type: "content" },
+                        { id: 3, title: "Insufficient citation sources", type: "technical" },
+                        { id: 4, title: "Content lacks E-E-A-T signals", type: "content" },
+                        { id: 5, title: "Poor semantic HTML structure", type: "technical" },
+                      ].slice(0, 3).map((issue) => (
+                        <div
+                          key={issue.id}
+                          className="p-2 rounded border cursor-pointer hover:bg-muted/50 transition-colors"
+                        >
+                          <div className="flex items-center justify-between">
+                            <span className="text-xs font-medium">{issue.title}</span>
+                            <Badge
+                              variant="outline"
+                              className={cn(
+                                "text-xs px-1.5 py-0",
+                                issue.type === "technical"
+                                  ? "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/30 dark:text-blue-400"
+                                  : "bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-900/30 dark:text-purple-400"
+                              )}
+                            >
+                              {issue.type === "technical" ? "Technical" : "Content"}
+                            </Badge>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                 </>
               )}
             </Card>
@@ -628,7 +820,7 @@ export default function AIPerformancePage() {
                       Visibility
                     </th>
                     <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase">
-                      Search Volume
+                      AI Volume
                     </th>
                     <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase">
                       Mentions
@@ -637,7 +829,7 @@ export default function AIPerformancePage() {
                       Intent
                     </th>
                     <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase">
-                      Similarity
+                      Similarity <span className="text-muted-foreground font-normal">[beta]</span>
                     </th>
                   </tr>
                 </thead>
@@ -673,15 +865,15 @@ export default function AIPerformancePage() {
                           >
                             {topic.name}
                           </td>
-                          <td className="px-4 py-3 text-sm font-mono">{topic.visibility}</td>
-                          <td className="px-4 py-3 text-sm">{topic.searchVolume}</td>
+                          <td className="px-4 py-3 text-xs">{topic.visibility}</td>
+                          <td className="px-4 py-3 text-xs">{topic.searchVolume}</td>
                           <td className="px-4 py-3 text-sm text-muted-foreground">
                             {topic.mentions.slice(0, 2).join(", ")}
                           </td>
                           <td className="px-4 py-3 text-sm">{topic.intent}</td>
                           <td className="px-4 py-3">
                             <Badge variant="secondary" className="font-mono text-xs">
-                              {topic.similarity}% <span className="text-muted-foreground ml-1">[beta]</span>
+                              {topic.similarity}%
                             </Badge>
                           </td>
                         </tr>
@@ -691,7 +883,7 @@ export default function AIPerformancePage() {
                             <tr key={`${topic.id}-prompt-${pIndex}`} className="bg-muted/30 border-b">
                               <td className="px-2"></td>
                               <td className="px-4 py-2 text-sm text-muted-foreground pl-8">{prompt.prompt}</td>
-                              <td className="px-4 py-2 text-sm font-mono text-muted-foreground">{prompt.visibility}</td>
+                              <td className="px-4 py-2 text-sm text-muted-foreground">{prompt.visibility}</td>
                               <td className="px-4 py-2 text-sm text-muted-foreground">{prompt.volume}</td>
                               <td className="px-4 py-2 text-sm text-muted-foreground">{prompt.mentions.join(", ")}</td>
                               <td className="px-4 py-2 text-sm text-muted-foreground">{prompt.intent}</td>
@@ -790,8 +982,8 @@ export default function AIPerformancePage() {
                               {citation.category}
                             </Badge>
                           </td>
-                          <td className="px-4 py-3 text-sm font-mono">{citation.citationRate}</td>
-                          <td className="px-4 py-3 text-sm text-muted-foreground">{citation.mentionedBy}</td>
+                          <td className="px-4 py-3 text-xs font-mono">{citation.citationRate}</td>
+                          <td className="px-4 py-3 text-xs text-muted-foreground">{citation.mentionedBy}</td>
                         </tr>
                         {isExpanded &&
                           citation.pages.map((page, pIndex) => (
@@ -804,7 +996,7 @@ export default function AIPerformancePage() {
                               </td>
                               <td className="px-4 py-2"></td>
                               <td className="px-4 py-2"></td>
-                              <td className="px-4 py-2 text-sm font-mono text-muted-foreground">{page.citationRate}</td>
+                              <td className="px-4 py-2 text-xs font-mono text-muted-foreground">{page.citationRate}</td>
                               <td className="px-4 py-2"></td>
                             </tr>
                           ))}

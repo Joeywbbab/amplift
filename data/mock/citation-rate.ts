@@ -9,17 +9,32 @@ export const citationRateAnalysis: CitationRateAnalysis = {
     {
       domainType: "Own",
       domain: "Own Citations",
-      citationCount: 4,
+      citationCount: "0.33%",
+      top3Domains: [
+        { domain: "amplift.com", pageUrl: "https://amplift.com/blog/automation-guide" },
+        { domain: "amplift.com", pageUrl: "https://amplift.com/docs/features" },
+        { domain: "amplift.com", pageUrl: "https://amplift.com/comparison/tools" },
+      ],
     },
     {
       domainType: "Earned",
       domain: "Earned Citations",
-      citationCount: 15,
+      citationCount: "1.25%",
+      top3Domains: [
+        { domain: "techcrunch.com" },
+        { domain: "venturebeat.com" },
+        { domain: "theverge.com" },
+      ],
     },
     {
       domainType: "Social",
       domain: "Social Citations",
-      citationCount: 10,
+      citationCount: "0.83%",
+      top3Domains: [
+        { domain: "twitter.com" },
+        { domain: "linkedin.com" },
+        { domain: "reddit.com" },
+      ],
     },
   ],
   industryPreference: {
@@ -32,5 +47,6 @@ export const citationRateAnalysis: CitationRateAnalysis = {
     description: "Negative mentions primarily appear in community forums (Reddit, Tesla Motors Club) and social media (Twitter), focusing on pricing concerns and service quality issues.",
   },
 }
+
 
 

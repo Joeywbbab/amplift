@@ -6,10 +6,17 @@ import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
-import { ExternalLink, ChevronRight, X, Forward } from "lucide-react"
+import { ExternalLink, ChevronRight, X, Forward, Filter, Clock, Check, ChevronDown, ChevronUp } from "lucide-react"
 import Link from "next/link"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer"
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import { cn } from "@/lib/utils"
 import { AIAnswerSection } from "@/components/shared/ai-answer-section"
 import { CitationsSection } from "@/components/shared/citations-section"
@@ -19,6 +26,7 @@ import { TopicDetail, Opportunity } from "@/lib/types"
 import { getTypeLabel, getTypeBadgeStyle, getOpportunityInsight } from "@/lib/utils/opportunity"
 import { opportunityTableData } from "@/data/mock/opportunities"
 import { opportunityAnalyses } from "@/data/mock/opportunity-details"
+import { answerHistoryData } from "@/data/mock/answer-history"
 
 // Mock data for topic detail
 const topicData: Record<string, TopicDetail> = {
@@ -718,6 +726,37 @@ export default function TopicDetailPage() {
   const [selectedOpportunity, setSelectedOpportunity] = useState<string | null>(null)
   const [showOpportunityDrawer, setShowOpportunityDrawer] = useState(false)
   const [drawerOpportunity, setDrawerOpportunity] = useState<Opportunity | null>(null)
+  const [showAnswerHistory, setShowAnswerHistory] = useState(false)
+  const [answerHistoryPromptId, setAnswerHistoryPromptId] = useState<number | null>(null) // null means all prompts
+  const [answerHistoryEngineFilter, setAnswerHistoryEngineFilter] = useState<string | null>(null)
+  const [answerHistoryTimeFilter, setAnswerHistoryTimeFilter] = useState<string>("all")
+  const [expandedAnswerIds, setExpandedAnswerIds] = useState<Set<number>>(new Set())
+
+  // Calculate total answers count for all prompts in this topic
+  const totalAnswersCount = topic.prompts.reduce((total, prompt) => {
+    const answers = answerHistoryData[prompt.id] || []
+    return total + answers.length
+  }, 0)
+
+  // Get all answers from all prompts in this topic, or from a specific prompt
+  const getAllTopicAnswers = () => {
+    const allAnswers: Array<{ id: number; promptId: number; prompt: string; timestamp: string; engine: string; answer: string; similarity: number }> = []
+    const promptsToProcess = answerHistoryPromptId 
+      ? topic.prompts.filter(p => p.id === answerHistoryPromptId)
+      : topic.prompts
+    
+    promptsToProcess.forEach((prompt) => {
+      const answers = answerHistoryData[prompt.id] || []
+      answers.forEach((answer) => {
+        allAnswers.push({
+          ...answer,
+          promptId: prompt.id,
+          prompt: prompt.prompt,
+        })
+      })
+    })
+    return allAnswers
+  }
 
   const handleOpportunityClick = (oppTitle: string) => {
     // Find matching opportunity from opportunityTableData
@@ -881,16 +920,33 @@ export default function TopicDetailPage() {
         </Card>
 
         {/* AI Answer Analysis */}
-        {topic.segmentedAnswer ? (
-          <SegmentedAIAnswer paragraphs={topic.segmentedAnswer} className="mb-6" />
-        ) : (
-          <AIAnswerSection 
-            aiAnswer={topic.aiAnswer} 
-            className="mb-6"
-            maxSimilaritySources={selectedPrompt ? 2 : 3}
-            showVariance={false}
-          />
-        )}
+        <Card className="p-5 mb-6">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="heading-lg">AI Answer Analysis</h3>
+            {totalAnswersCount > 0 && (
+              <button
+                onClick={() => {
+                  setAnswerHistoryPromptId(null) // Show all prompts
+                  setShowAnswerHistory(true)
+                }}
+                className="text-sm text-primary hover:underline flex items-center gap-1"
+              >
+                Combined {totalAnswersCount} answers
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            )}
+          </div>
+          {topic.segmentedAnswer ? (
+            <SegmentedAIAnswer paragraphs={topic.segmentedAnswer} className="mb-0" />
+          ) : (
+            <AIAnswerSection 
+              aiAnswer={topic.aiAnswer} 
+              className="mb-0"
+              maxSimilaritySources={selectedPrompt ? 2 : 3}
+              showVariance={false}
+            />
+          )}
+        </Card>
 
         {/* Top Citations */}
         <CitationsSection citations={topic.citations} className="mb-6" />
@@ -1003,11 +1059,28 @@ export default function TopicDetailPage() {
             </Card>
 
             {/* AI Answer Analysis */}
-            {selectedPrompt.segmentedAnswer ? (
-              <SegmentedAIAnswer paragraphs={selectedPrompt.segmentedAnswer} />
-            ) : (
-              <AIAnswerSection aiAnswer={selectedPrompt.aiAnswer} showVariance={false} />
-            )}
+            <Card className="p-5">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="heading-lg">AI Answer Analysis</h3>
+                {answerHistoryData[selectedPrompt.id] && answerHistoryData[selectedPrompt.id].length > 0 && (
+                  <button
+                    onClick={() => {
+                      setAnswerHistoryPromptId(selectedPrompt.id) // Show only this prompt's answers
+                      setShowAnswerHistory(true)
+                    }}
+                    className="text-sm text-primary hover:underline flex items-center gap-1"
+                  >
+                    Combined {answerHistoryData[selectedPrompt.id].length} answers
+                    <ChevronRight className="w-4 h-4" />
+                  </button>
+                )}
+              </div>
+              {selectedPrompt.segmentedAnswer ? (
+                <SegmentedAIAnswer paragraphs={selectedPrompt.segmentedAnswer} />
+              ) : (
+                <AIAnswerSection aiAnswer={selectedPrompt.aiAnswer} showVariance={false} />
+              )}
+            </Card>
 
             {/* Top Citations */}
             <CitationsSection citations={selectedPrompt.citations} />
@@ -1347,6 +1420,196 @@ export default function TopicDetailPage() {
           )}
         </DrawerContent>
       </Drawer>
+
+      {/* Answers Sheet */}
+      <Sheet open={showAnswerHistory} onOpenChange={(open) => {
+        setShowAnswerHistory(open)
+        if (!open) {
+          // Reset filters when closing
+          setAnswerHistoryPromptId(null)
+          setAnswerHistoryEngineFilter(null)
+          setAnswerHistoryTimeFilter("all")
+          setExpandedAnswerIds(new Set())
+        }
+      }}>
+        <SheetContent side="right" className="w-full sm:max-w-2xl">
+          <SheetHeader>
+            <SheetTitle>
+              {answerHistoryPromptId 
+                ? topic.prompts.find(p => p.id === answerHistoryPromptId)?.prompt || "Answers"
+                : "Answers"}
+            </SheetTitle>
+          </SheetHeader>
+          
+          {/* Filters */}
+          <div className="mt-6 flex items-center gap-3 px-4">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="sm" className="text-xs">
+                  <Filter className="w-3 h-3 mr-1.5" />
+                  {answerHistoryEngineFilter || "All Models"}
+                  {answerHistoryEngineFilter && (
+                    <X className="w-3 h-3 ml-1.5" onClick={(e) => {
+                      e.stopPropagation()
+                      setAnswerHistoryEngineFilter(null)
+                    }} />
+                  )}
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start">
+                <DropdownMenuItem onClick={() => setAnswerHistoryEngineFilter(null)}>
+                  All Models
+                  {!answerHistoryEngineFilter && <Check className="ml-auto w-4 h-4" />}
+                </DropdownMenuItem>
+                {(() => {
+                  const allAnswers = getAllTopicAnswers()
+                  const engines = Array.from(new Set(allAnswers.map(item => item.engine)))
+                  return engines.map((engine) => (
+                    <DropdownMenuItem
+                      key={engine}
+                      onClick={() => setAnswerHistoryEngineFilter(engine)}
+                    >
+                      {engine}
+                      {answerHistoryEngineFilter === engine && <Check className="ml-auto w-4 h-4" />}
+                    </DropdownMenuItem>
+                  ))
+                })()}
+              </DropdownMenuContent>
+            </DropdownMenu>
+            
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="sm" className="text-xs">
+                  <Clock className="w-3 h-3 mr-1.5" />
+                  {answerHistoryTimeFilter === "all" ? "All Time" : answerHistoryTimeFilter === "today" ? "Today" : answerHistoryTimeFilter === "week" ? "This Week" : "This Month"}
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start">
+                <DropdownMenuItem onClick={() => setAnswerHistoryTimeFilter("all")}>
+                  All Time
+                  {answerHistoryTimeFilter === "all" && <Check className="ml-auto w-4 h-4" />}
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setAnswerHistoryTimeFilter("today")}>
+                  Today
+                  {answerHistoryTimeFilter === "today" && <Check className="ml-auto w-4 h-4" />}
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setAnswerHistoryTimeFilter("week")}>
+                  This Week
+                  {answerHistoryTimeFilter === "week" && <Check className="ml-auto w-4 h-4" />}
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setAnswerHistoryTimeFilter("month")}>
+                  This Month
+                  {answerHistoryTimeFilter === "month" && <Check className="ml-auto w-4 h-4" />}
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+
+          <div className="mt-4 space-y-4 px-4">
+            {(() => {
+              let filtered = getAllTopicAnswers()
+              
+              // Filter by engine
+              if (answerHistoryEngineFilter) {
+                filtered = filtered.filter(item => item.engine === answerHistoryEngineFilter)
+              }
+              
+              // Filter by time
+              if (answerHistoryTimeFilter !== "all") {
+                const now = new Date()
+                filtered = filtered.filter(item => {
+                  const itemDate = new Date(item.timestamp)
+                  if (answerHistoryTimeFilter === "today") {
+                    return itemDate.toDateString() === now.toDateString()
+                  } else if (answerHistoryTimeFilter === "week") {
+                    const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)
+                    return itemDate >= weekAgo
+                  } else if (answerHistoryTimeFilter === "month") {
+                    const monthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000)
+                    return itemDate >= monthAgo
+                  }
+                  return true
+                })
+              }
+              
+              return filtered.length > 0 ? (
+                filtered.map((item, index) => {
+                  const uniqueId = `${item.promptId}-${item.id}`
+                  const isExpanded = expandedAnswerIds.has(parseInt(uniqueId.replace('-', '')) || item.id)
+                  
+                  return (
+                    <Card 
+                      key={`${item.promptId}-${item.id}-${index}`} 
+                      className="p-4 cursor-pointer hover:bg-accent/50 transition-colors"
+                      onClick={() => {
+                        const id = parseInt(uniqueId.replace('-', '')) || item.id
+                        setExpandedAnswerIds(prev => {
+                          const newSet = new Set(prev)
+                          if (newSet.has(id)) {
+                            newSet.delete(id)
+                          } else {
+                            newSet.add(id)
+                          }
+                          return newSet
+                        })
+                      }}
+                    >
+                      <div className="flex items-start justify-between mb-3">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-2">
+                            <Badge variant="outline" className="text-xs">
+                              {item.engine}
+                            </Badge>
+                            <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                              <Clock className="w-3 h-3" />
+                              <span>{item.timestamp}</span>
+                            </div>
+                          </div>
+                          {!answerHistoryPromptId && (
+                            <p className="text-xs text-muted-foreground mb-1">Prompt: {item.prompt}</p>
+                          )}
+                        </div>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            const id = parseInt(uniqueId.replace('-', '')) || item.id
+                            setExpandedAnswerIds(prev => {
+                              const newSet = new Set(prev)
+                              if (newSet.has(id)) {
+                                newSet.delete(id)
+                              } else {
+                                newSet.add(id)
+                              }
+                              return newSet
+                            })
+                          }}
+                          className="p-1 hover:bg-muted rounded transition-colors flex-shrink-0"
+                        >
+                          {isExpanded ? (
+                            <ChevronUp className="w-4 h-4 text-muted-foreground" />
+                          ) : (
+                            <ChevronDown className="w-4 h-4 text-muted-foreground" />
+                          )}
+                        </button>
+                      </div>
+                      <p className={cn(
+                        "body-text-sm text-muted-foreground leading-relaxed whitespace-pre-wrap",
+                        !isExpanded && "line-clamp-3"
+                      )}>
+                        {item.answer}
+                      </p>
+                    </Card>
+                  )
+                })
+              ) : (
+                <div className="text-center py-8">
+                  <p className="body-muted">No answers found</p>
+                </div>
+              )
+            })()}
+          </div>
+        </SheetContent>
+      </Sheet>
     </div>
   )
 }

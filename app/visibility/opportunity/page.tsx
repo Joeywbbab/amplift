@@ -23,6 +23,8 @@ import {
   ExternalLink,
   Bell,
   PenTool,
+  Send,
+  RotateCcw,
 } from "lucide-react"
 import Link from "next/link"
 import { cn } from "@/lib/utils"
@@ -254,7 +256,7 @@ function OpportunityPageContent() {
                 Explore more
               </a>
             </Button>
-            {(selectedItem || selectedSavedPost) && (
+            {(selectedItem || selectedSavedPost) && selectedFolder !== "trash" && selectedFolder !== "archived" && (
               <>
                 <Button variant="ghost" size="sm" className="h-8 gap-1.5 font-normal">
                   <Trash2 className="w-4 h-4" />
@@ -265,6 +267,18 @@ function OpportunityPageContent() {
                   Archive
                 </Button>
               </>
+            )}
+            {(selectedItem || selectedSavedPost) && selectedFolder === "archived" && (
+              <Button variant="ghost" size="sm" className="h-8 gap-1.5 font-normal">
+                <Trash2 className="w-4 h-4" />
+                Delete
+              </Button>
+            )}
+            {(selectedItem || selectedSavedPost) && selectedFolder === "trash" && (
+              <Button variant="ghost" size="sm" className="h-8 gap-1.5 font-normal">
+                <Trash2 className="w-4 h-4" />
+                Delete permanently
+              </Button>
             )}
           </div>
           <div className="flex-1"></div>
@@ -342,7 +356,7 @@ function OpportunityPageContent() {
                 <div className="mt-6">
                   <div className="px-3 mb-2">
                     <span className="text-xs font-medium text-muted-foreground">
-                      Tags
+                      Filters
                     </span>
                   </div>
                   <div className="space-y-0.5">
@@ -461,7 +475,7 @@ function OpportunityPageContent() {
                     <h2 className="text-lg font-semibold">Opportunity</h2>
                     <div className="flex items-center gap-2">
                       <Button size="sm" onClick={handleSend}>
-                        Send
+                        {selectedFolder === "archived" || selectedFolder === "trash" ? "Restore" : "Send"}
                       </Button>
                     </div>
                   </div>
@@ -704,7 +718,7 @@ function OpportunityPageContent() {
                         <Bookmark className="w-4 h-4 fill-current text-primary" />
                       </Button>
                       <Button size="sm">
-                        Share
+                        {selectedFolder === "archived" || selectedFolder === "trash" ? "Restore" : "Send"}
                       </Button>
                     </div>
                   </div>

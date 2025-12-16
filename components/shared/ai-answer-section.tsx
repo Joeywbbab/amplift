@@ -17,8 +17,7 @@ export function AIAnswerSection({ aiAnswer, className, maxSimilaritySources, sho
     : aiAnswer.similarity.sources
 
   return (
-    <Card className={cn("p-5", className)}>
-      <h3 className="heading-lg mb-4">AI Answer Analysis</h3>
+    <div className={cn(className)}>
 
       {/* Similarity Section */}
       <div className={showVariance ? "mb-4" : ""}>
@@ -100,7 +99,7 @@ export function AIAnswerSection({ aiAnswer, className, maxSimilaritySources, sho
           </div>
         </>
       )}
-    </Card>
+    </div>
   )
 }
 

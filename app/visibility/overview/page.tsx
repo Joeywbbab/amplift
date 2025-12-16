@@ -801,7 +801,7 @@ export default function OverviewPage() {
                 <div className="p-4 border-b flex items-center justify-between">
                   <h2 className="heading-lg">
                     {brandModalTab === "settings" && "Info"}
-                    {brandModalTab === "competitors" && "Direct Competitors"}
+                    {brandModalTab === "competitors" && "Competitors"}
                     {brandModalTab === "geo-history" && "GEO Checker History"}
                     {brandModalTab === "gsc" && "Google Search Console"}
                   </h2>
@@ -865,27 +865,62 @@ export default function OverviewPage() {
 
                   {/* Competitors Tab */}
                   {brandModalTab === "competitors" && (
-                    <div className="space-y-3">
-                      <p className="body-muted mb-4">
-                        Track your competitors to compare visibility and share of voice.
-                      </p>
-                      {competitors.map((comp, idx) => (
-                        <div key={idx} className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
-                          <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center body-text-sm font-bold">
-                              {comp.name[0]}
-                            </div>
-                            <div>
-                              <p className="body-text-sm font-medium">{comp.name}</p>
-                              <p className="body-muted">{comp.domain}</p>
-                            </div>
-                          </div>
-                          <button className="body-text-sm text-destructive hover:underline">Remove</button>
+                    <div className="space-y-6">
+                      {/* Direct Competitors Section */}
+                      <div>
+                        <div className="mb-3">
+                          <h4 className="body-text-sm font-semibold">Direct Competitors</h4>
+                          <p className="body-muted text-xs mt-1">Competitors you are currently tracking</p>
                         </div>
-                      ))}
-                      <button className="w-full p-4 border border-dashed rounded-lg body-text-sm text-muted-foreground hover:bg-muted/50 flex items-center justify-center gap-2">
-                        <Plus className="w-4 h-4" /> Add Competitor
-                      </button>
+                        <div className="space-y-3">
+                          {competitors.map((comp, idx) => (
+                            <div key={idx} className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
+                              <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center body-text-sm font-bold">
+                                  {comp.name[0]}
+                                </div>
+                                <div>
+                                  <p className="body-text-sm font-medium">{comp.name}</p>
+                                  <p className="body-muted">{comp.domain}</p>
+                                </div>
+                              </div>
+                              <button className="body-text-sm text-destructive hover:underline">Remove</button>
+                            </div>
+                          ))}
+                          <button className="w-full p-4 border border-dashed rounded-lg body-text-sm text-muted-foreground hover:bg-muted/50 flex items-center justify-center gap-2">
+                            <Plus className="w-4 h-4" /> Add Competitor
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Potential Competitors Section */}
+                      <div>
+                        <div className="mb-3">
+                          <h4 className="body-text-sm font-semibold">Potential Competitors</h4>
+                          <p className="body-muted text-xs mt-1">Brands appearing in AI answers but not yet tracked</p>
+                        </div>
+                        <div className="grid grid-cols-3 gap-2">
+                          {[
+                            { name: "Marketo", domain: "marketo.com" },
+                            { name: "Pardot", domain: "pardot.com" },
+                            { name: "ActiveCampaign", domain: "activecampaign.com" },
+                            { name: "Mailchimp", domain: "mailchimp.com" },
+                            { name: "Klaviyo", domain: "klaviyo.com" },
+                          ].map((comp, idx) => (
+                            <div key={idx} className="flex items-center justify-between p-2 bg-muted/30 rounded-lg">
+                              <div className="flex items-center gap-2">
+                                <div className="w-6 h-6 rounded-full bg-muted flex items-center justify-center text-xs font-medium">
+                                  {comp.name[0]}
+                                </div>
+                                <p className="text-xs font-medium truncate">{comp.name}</p>
+                              </div>
+                              <button className="w-5 h-5 rounded-full bg-primary/10 hover:bg-primary/20 flex items-center justify-center transition-colors shrink-0">
+                                <Plus className="w-3 h-3 text-primary" />
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
                     </div>
                   )}
 
@@ -1125,6 +1160,7 @@ export default function OverviewPage() {
     </DashboardLayout>
   )
 }
+
 
 
 

@@ -131,8 +131,7 @@ export function SegmentedAIAnswer({ paragraphs, className }: SegmentedAIAnswerPr
   }
 
   return (
-    <Card className={cn("p-5", className)}>
-      <h3 className="heading-lg mb-4">AI Answer Analysis</h3>
+    <div className={cn(className)}>
 
       <div className="space-y-6">
         {paragraphs.map((paragraph, index) => (
@@ -151,7 +150,7 @@ export function SegmentedAIAnswer({ paragraphs, className }: SegmentedAIAnswerPr
           </div>
         ))}
       </div>
-    </Card>
+    </div>
   )
 }
 

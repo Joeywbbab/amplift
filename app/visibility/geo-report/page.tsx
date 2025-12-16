@@ -92,6 +92,45 @@ export default function GeoReportPage() {
   const technicalIssues = issues.filter(i => i.category === "Technical")
   const contentIssues = issues.filter(i => i.category === "Content")
 
+  // Export GEO Report as CSV
+  const handleExport = () => {
+    // Create CSV content
+    const csvRows = []
+    
+    // Add header section
+    csvRows.push("GEO Report - Export")
+    csvRows.push(`Generated: ${new Date().toLocaleDateString()}`)
+    csvRows.push("")
+    
+    // Add scores section
+    csvRows.push("SCORES")
+    csvRows.push(`AEO Score,${geoScores.aeoScore}/100`)
+    csvRows.push(`Technical Readiness,${geoScores.technicalReadiness}/100`)
+    csvRows.push(`Content Quality,${geoScores.contentQuality}/100`)
+    csvRows.push("")
+    
+    // Add issues table header
+    csvRows.push("ISSUES")
+    csvRows.push("Issue,Category,Severity,URL,Details,Detected")
+    
+    // Add issues data
+    issues.forEach(issue => {
+      csvRows.push(`"${issue.issue}","${issue.category}","${issue.severity}","${issue.url}","${issue.details}","${issue.detected}"`)
+    })
+    
+    // Create and download file
+    const csvContent = csvRows.join("\n")
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" })
+    const link = document.createElement("a")
+    const url = URL.createObjectURL(blob)
+    link.setAttribute("href", url)
+    link.setAttribute("download", `geo-report-${new Date().toISOString().split("T")[0]}.csv`)
+    link.style.visibility = "hidden"
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+  }
+
   const filteredIssues = filterCategory === "all"
     ? issues
     : issues.filter(issue => issue.category === filterCategory)
@@ -111,7 +150,7 @@ export default function GeoReportPage() {
     <DashboardLayout currentSection="visibility" currentSubSection="overview">
       <BreadcrumbHeader
         items={["Home", "Visibility", "Overview", "GEO Report"]}
-        action={{ label: "Export" }}
+        action={{ label: "Export", onClick: handleExport }}
       />
 
       <div className="flex-1 overflow-auto p-8">

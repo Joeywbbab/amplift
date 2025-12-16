@@ -4,11 +4,36 @@ import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { DashboardLayout } from "@/components/dashboard-layout"
 import { BreadcrumbHeader } from "@/components/breadcrumb-header"
-import { Card } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
-import { FileText, Code, RefreshCw, Target, Zap, CheckCircle2, Loader2 } from "lucide-react"
+import { FileText, Code, RefreshCw, Target, Zap } from "lucide-react"
+
+// Custom cursor/pencil icon with sparkles
+const WorkflowIcon = ({ className }: { className?: string }) => (
+  <svg
+    viewBox="0 0 100 100"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2.5"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={className}
+  >
+    {/* Main cursor/pencil shape */}
+    <path d="M25 85 L25 55 L55 25" />
+    <path d="M55 25 L75 45" />
+    <path d="M25 85 L45 65" />
+    
+    {/* Top triangle indicator */}
+    <path d="M45 15 L55 25 L40 30 Z" fill="none" />
+    
+    {/* Sparkle lines on the right */}
+    <path d="M65 20 L72 13" className="animate-pulse" />
+    <path d="M75 35 L90 35" className="animate-pulse" style={{ animationDelay: '0.2s' }} />
+    <path d="M75 50 L85 60" className="animate-pulse" style={{ animationDelay: '0.4s' }} />
+    <path d="M65 60 L70 65" className="animate-pulse" style={{ animationDelay: '0.3s' }} />
+  </svg>
+)
+import { cn } from "@/lib/utils"
 
 const analysisSteps = [
   { id: 1, label: "Scanning website structure", duration: 2000 },
@@ -18,24 +43,49 @@ const analysisSteps = [
   { id: 5, label: "Calculating GEO score", duration: 2000 },
 ]
 
+const infoTexts = [
+  {
+    id: "geo-score",
+    label: "GEO Score",
+    text: "Measures how effectively your content performs across AI platforms.",
+  },
+  {
+    id: "technical-seo",
+    label: "Technical SEO",
+    text: "Meta tags, page speed, and structured data are evaluated for AI optimization.",
+  },
+  {
+    id: "content-quality",
+    label: "Content Quality",
+    text: "Depth, accuracy, and readability determine how valuable your content is.",
+  },
+  {
+    id: "content-freshness",
+    label: "Content Freshness",
+    text: "Fresh, regularly updated content is more likely to be cited by AI.",
+  },
+  {
+    id: "topic-relevance",
+    label: "Topic Relevance",
+    text: "Alignment with search intent ensures your content appears in AI responses.",
+  },
+  {
+    id: "citation-authority",
+    label: "Citation Authority",
+    text: "More citations from AI platforms mean higher visibility and authority.",
+  },
+]
+
 export default function GeoPerformancePage() {
   const router = useRouter()
-  const [isAnalyzing, setIsAnalyzing] = useState(false)
   const [currentStep, setCurrentStep] = useState(0)
   const [progress, setProgress] = useState(0)
+  const [currentTextIndex, setCurrentTextIndex] = useState(0)
 
-  const startAnalysis = () => {
-    setIsAnalyzing(true)
-    setCurrentStep(0)
-    setProgress(0)
-  }
-
+  // Auto-start analysis on page load
   useEffect(() => {
-    if (!isAnalyzing) return
-
     let stepIndex = 0
     let currentProgress = 0
-    const totalDuration = analysisSteps.reduce((sum, step) => sum + step.duration, 0)
 
     const processStep = () => {
       if (stepIndex >= analysisSteps.length) {
@@ -69,184 +119,66 @@ export default function GeoPerformancePage() {
     }
 
     processStep()
-  }, [isAnalyzing, router])
+  }, [router])
 
-  if (isAnalyzing) {
-    return (
-      <DashboardLayout currentSection="visibility" currentSubSection="ai-performance">
-        <BreadcrumbHeader
-          items={["Home", "Visibility", "AI performance", "GEO Audit"]}
-        />
+  // Auto-rotate info texts
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentTextIndex((prev) => (prev + 1) % infoTexts.length)
+    }, 4000) // Switch every 4 seconds
 
-        <div className="flex-1 overflow-auto p-8">
-          <div className="max-w-2xl mx-auto">
-            <div className="text-center mb-8">
-              <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
-                <Loader2 className="w-10 h-10 text-primary animate-spin" />
-              </div>
-              <h1 className="heading-xl mb-3">Analyzing Your Content</h1>
-              <p className="body-muted">
-                We're running a comprehensive audit of your website. This may take a few moments...
-              </p>
-            </div>
-
-            <Card className="p-8">
-              {/* Progress Bar */}
-              <div className="mb-8">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-medium text-foreground">Progress</span>
-                  <span className="text-sm text-muted-foreground">{Math.round(progress)}%</span>
-                </div>
-                <Progress value={progress} className="h-2" />
-              </div>
-
-              {/* Analysis Steps */}
-              <div className="space-y-4">
-                {analysisSteps.map((step, index) => {
-                  const isActive = index === currentStep
-                  const isCompleted = index < currentStep
-                  
-                  return (
-                    <div
-                      key={step.id}
-                      className={`flex items-center gap-3 p-4 rounded-lg border transition-colors ${
-                        isActive
-                          ? "bg-primary/5 border-primary/20"
-                          : isCompleted
-                          ? "bg-muted/50 border-border"
-                          : "bg-background border-border opacity-50"
-                      }`}
-                    >
-                      <div className="shrink-0">
-                        {isCompleted ? (
-                          <CheckCircle2 className="w-5 h-5 text-green-500" />
-                        ) : isActive ? (
-                          <Loader2 className="w-5 h-5 text-primary animate-spin" />
-                        ) : (
-                          <div className="w-5 h-5 rounded-full border-2 border-muted-foreground" />
-                        )}
-                      </div>
-                      <div className="flex-1">
-                        <p
-                          className={`text-sm font-medium ${
-                            isActive
-                              ? "text-foreground"
-                              : isCompleted
-                              ? "text-muted-foreground"
-                              : "text-muted-foreground"
-                          }`}
-                        >
-                          {step.label}
-                        </p>
-                      </div>
-                    </div>
-                  )
-                })}
-              </div>
-
-              <div className="mt-8 pt-6 border-t">
-                <p className="text-sm text-muted-foreground text-center">
-                  Analyzing your content across multiple AI platforms...
-                </p>
-              </div>
-            </Card>
-          </div>
-        </div>
-      </DashboardLayout>
-    )
-  }
+    return () => clearInterval(interval)
+  }, [])
 
   return (
     <DashboardLayout currentSection="visibility" currentSubSection="ai-performance">
       <BreadcrumbHeader
         items={["Home", "Visibility", "AI performance", "GEO Audit"]}
-        action={{ label: "Export" }}
       />
 
-      <div className="flex-1 overflow-auto p-8">
-        <div className="max-w-4xl mx-auto">
-          <div className="text-center mb-8">
-            <h1 className="heading-xl mb-3">GEO Audit</h1>
-            <p className="body-muted">
-              Run a comprehensive audit to measure your Generative Engine Optimization score
+      <div className="flex-1 overflow-auto p-8 flex items-center justify-center">
+        <div className="max-w-md mx-auto text-center">
+          {/* Animated Icon */}
+          <div className="mb-6">
+            <div className="inline-flex items-center justify-center">
+              <WorkflowIcon className="w-24 h-24 text-primary" />
+            </div>
+          </div>
+
+          {/* Progress Bar */}
+          <div className="mb-8 px-8">
+            <Progress value={progress} className="h-1.5" />
+            {currentStep < analysisSteps.length && (
+              <p className="text-xs text-muted-foreground mt-2">
+                {analysisSteps[currentStep].label}
+              </p>
+            )}
+          </div>
+
+          {/* Auto-rotating Info Text */}
+          <div className="min-h-[48px] flex items-center justify-center">
+            <p className="text-xs text-muted-foreground leading-relaxed transition-opacity duration-300">
+              <span className="font-medium">{infoTexts[currentTextIndex].label}:</span>{" "}
+              {infoTexts[currentTextIndex].text}
             </p>
           </div>
 
-          <Card className="p-8 mb-6">
-            <h2 className="heading-lg mb-4">What is GEO Score?</h2>
-            <p className="body-muted leading-relaxed mb-4">
-              GEO (Generative Engine Optimization) Score measures how effectively your content performs across AI
-              platforms like ChatGPT, Perplexity, Claude, and Google AI. It evaluates multiple factors including
-              technical SEO, content quality, and topic relevance.
-            </p>
-            <p className="body-muted leading-relaxed">
-              A higher GEO score means your brand is more likely to be recommended and cited by AI systems when users
-              ask relevant questions.
-            </p>
-          </Card>
-
-          <Card className="p-8 mb-6">
-            <h2 className="heading-lg mb-6">Audit Criteria</h2>
-            <div className="grid md:grid-cols-2 gap-4">
-              <div className="flex items-start gap-3 p-4 rounded-lg border">
-                <Code className="w-5 h-5 text-muted-foreground mt-0.5 shrink-0" />
-                <div>
-                  <h3 className="body-text-sm font-semibold mb-1">Technical SEO</h3>
-                  <p className="text-caption-muted">Meta tags, page speed, structured data, mobile optimization</p>
-                </div>
-              </div>
-              <div className="flex items-start gap-3 p-4 rounded-lg border">
-                <FileText className="w-5 h-5 text-muted-foreground mt-0.5 shrink-0" />
-                <div>
-                  <h3 className="body-text-sm font-semibold mb-1">Content Quality</h3>
-                  <p className="text-caption-muted">Depth, accuracy, readability, and usefulness of content</p>
-                </div>
-              </div>
-              <div className="flex items-start gap-3 p-4 rounded-lg border">
-                <RefreshCw className="w-5 h-5 text-muted-foreground mt-0.5 shrink-0" />
-                <div>
-                  <h3 className="body-text-sm font-semibold mb-1">Content Freshness</h3>
-                  <p className="text-caption-muted">Recency and update frequency of your content</p>
-                </div>
-              </div>
-              <div className="flex items-start gap-3 p-4 rounded-lg border">
-                <Target className="w-5 h-5 text-muted-foreground mt-0.5 shrink-0" />
-                <div>
-                  <h3 className="body-text-sm font-semibold mb-1">Topic Relevance</h3>
-                  <p className="text-caption-muted">Alignment with user queries and search intent</p>
-                </div>
-              </div>
-              <div className="flex items-start gap-3 p-4 rounded-lg border">
-                <Zap className="w-5 h-5 text-muted-foreground mt-0.5 shrink-0" />
-                <div>
-                  <h3 className="body-text-sm font-semibold mb-1">Citation Authority</h3>
-                  <p className="text-caption-muted">How often AI platforms reference your content</p>
-                </div>
-              </div>
-            </div>
-          </Card>
-
-          <Card className="p-8 bg-accent/30">
-            <h2 className="heading-lg mb-2">Ready to Audit?</h2>
-            <p className="body-muted mb-6">
-              The audit takes approximately 24-48 hours as we analyze your content across multiple AI platforms and gather
-              comprehensive performance data.
-            </p>
-            <div className="flex gap-3">
-              <Button
-                onClick={startAnalysis}
-                className="px-6 py-2 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition-colors"
-              >
-                Start GEO Audit
-              </Button>
-              <Button
-                variant="outline"
-                className="px-6 py-2 border border-border rounded-lg font-medium hover:bg-accent transition-colors"
-              >
-                Learn More
-              </Button>
-            </div>
-          </Card>
+          {/* Text Indicators */}
+          <div className="flex items-center justify-center gap-1.5 mt-6">
+            {infoTexts.map((_, index) => (
+              <button
+                key={index}
+                onClick={() => setCurrentTextIndex(index)}
+                className={cn(
+                  "w-1.5 h-1.5 rounded-full transition-all",
+                  index === currentTextIndex
+                    ? "bg-primary w-4"
+                    : "bg-muted-foreground/30 hover:bg-muted-foreground/50"
+                )}
+                aria-label={`Go to info ${index + 1}`}
+              />
+            ))}
+          </div>
         </div>
       </div>
     </DashboardLayout>
