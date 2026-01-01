@@ -175,44 +175,9 @@ export function DashboardLayout({
       </div>
 
       <div className="flex flex-1 overflow-hidden">
-        {/* Primary Sidebar - Icon Bar */}
-        <div className="bg-muted/30 border-r border-border flex flex-col w-16">
-          {/* Main Navigation Icons (Left Edge) */}
-          <div className="flex-1 flex overflow-hidden">
-            {/* Icon Bar */}
-            <div className="w-16 border-r border-t border-border flex flex-col items-center py-2 gap-1">
-              {primaryNav.map((item) => {
-                const Icon = item.icon
-                const isActive = currentSection === item.id
-                return (
-                  <Link
-                    key={item.id}
-                    href={item.href}
-                    className={cn(
-                      "w-10 h-10 rounded-full flex items-center justify-center transition-colors relative",
-                      isActive
-                        ? "bg-sidebar-accent text-sidebar-accent-foreground"
-                        : "text-sidebar-foreground hover:bg-sidebar-accent/50",
-                    )}
-                    title={item.label}
-                  >
-                    <Icon className="w-5 h-5" />
-                    {item.id === "home" && (
-                      <Badge className="absolute -top-1 -right-1 h-4 w-4 p-0 flex items-center justify-center bg-red-500 text-white text-[8px]">
-                        1
-                      </Badge>
-                    )}
-                  </Link>
-                )
-              })}
-            </div>
-
-          </div>
-        </div>
-
         {/* Secondary Sidebar for Visibility (Right Side) */}
         {currentSection === "visibility" && !hideSecondarySidebar && (
-          <div className="w-[220px] bg-muted/30 border-r border-border flex flex-col ml-[5px]">
+          <div className="w-[220px] bg-muted/30 border-r border-border flex flex-col">
             <div className="px-3 py-2.5 border-b border-t border-x border-border">
               <h2 className="text-sm font-semibold text-foreground">Visibility</h2>
             </div>
